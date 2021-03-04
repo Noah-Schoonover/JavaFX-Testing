@@ -42,7 +42,7 @@ public class Xform extends Group {
     }
 
     public Translate t  = new Translate();
-    public Translate p = new Translate();
+    public Translate p  = new Translate();
     public Translate ip = new Translate();
     public Rotate rx = new Rotate();
     { rx.setAxis(Rotate.X_AXIS); }
@@ -63,6 +63,9 @@ public class Xform extends Group {
         switch (rotateOrder) {
             case XYZ:
                 getTransforms().addAll(t, p, rz, ry, rx, s, ip);
+                break;
+            case XZY:
+                getTransforms().addAll(t, p, ry, rz, rx, s, ip);
                 break;
             case YXZ:
                 getTransforms().addAll(t, p, rz, rx, ry, s, ip);
@@ -108,6 +111,7 @@ public class Xform extends Group {
     public void setRotateX(double x) { rx.setAngle(x); }
     public void setRotateY(double y) { ry.setAngle(y); }
     public void setRotateZ(double z) { rz.setAngle(z); }
+    public void setRx(double x) { rx.setAngle(x); }
     public void setRy(double y) { ry.setAngle(y); }
     public void setRz(double z) { rz.setAngle(z); }
 
@@ -115,6 +119,12 @@ public class Xform extends Group {
         s.setX(scaleFactor);
         s.setY(scaleFactor);
         s.setZ(scaleFactor);
+    }
+
+    public void setScale(double x, double y, double z) {
+        s.setX(x);
+        s.setY(y);
+        s.setZ(z);
     }
 
     // Cannot override these methods as they are final:
@@ -168,8 +178,8 @@ public class Xform extends Group {
         ip.setZ(0.0);
     }
 
-    public void debug() {
-        System.out.println("t = (" +
+    @Override public String toString() {
+        return "Xform[t = (" +
                 t.getX() + ", " +
                 t.getY() + ", " +
                 t.getZ() + ")  " +
@@ -188,6 +198,6 @@ public class Xform extends Group {
                 "ip = (" +
                 ip.getX() + ", " +
                 ip.getY() + ", " +
-                ip.getZ() + ")");
+                ip.getZ() + ")]";
     }
 }
