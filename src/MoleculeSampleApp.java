@@ -43,6 +43,9 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
+
 /**
  *
  * @author cmcastil
@@ -51,7 +54,7 @@ public class MoleculeSampleApp extends Application {
 
     final Group root = new Group();
     final Xform axisGroup = new Xform();
-    final Xform moleculeGroup = new Xform();
+    final Xform groundGroup = new Xform();
     final Xform world = new Xform();
     final PerspectiveCamera camera = new PerspectiveCamera(true);
     final Xform cameraXform = new Xform();
@@ -66,8 +69,8 @@ public class MoleculeSampleApp extends Application {
     private static final double HYDROGEN_ANGLE = 120;
     private static final double CONTROL_MULTIPLIER = 0.1;
     private static final double SHIFT_MULTIPLIER = 10.0;
-    private static final double MOUSE_SPEED = 0.1;
-    private static final double ROTATION_SPEED = 2.0;
+    private static final double MOUSE_SPEED = 0.5;
+    private static final double ROTATION_SPEED = 0.3;
     private static final double TRACK_SPEED = 0.3;
 
     double mousePosX;
@@ -182,7 +185,7 @@ public class MoleculeSampleApp extends Application {
                         axisGroup.setVisible(!axisGroup.isVisible());
                         break;
                     case V:
-                        moleculeGroup.setVisible(!moleculeGroup.isVisible());
+                        groundGroup.setVisible(!groundGroup.isVisible());
                         break;
                 }
             }
@@ -263,9 +266,49 @@ public class MoleculeSampleApp extends Application {
         hydrogen2Xform.setTx(100.0);
         hydrogen2SideXform.setRotateY(HYDROGEN_ANGLE);
 
-        moleculeGroup.getChildren().add(moleculeXform);
+        groundGroup.getChildren().add(moleculeXform);
 
-        world.getChildren().addAll(moleculeGroup);
+        world.getChildren().addAll(groundGroup);
+    }
+
+    public void buildMesh() {
+
+        float[] points =
+                {
+                        50, 0, 0,
+                        45, 0, 10,
+                        55, 0, 10
+                };
+
+        float[] texCoords =
+                {
+                        0.5f, 0.5f,
+                        0.0f, 1.0f,
+                        1.0f, 1.0f
+                };
+
+        int[] faces =
+                {
+                        0, 0, 2, 2, 1, 1,
+                        0, 0, 1, 1, 2, 2
+                };
+
+        // Create a TriangleMesh
+        TriangleMesh mesh = new TriangleMesh();
+        mesh.getPoints().addAll(points);
+        mesh.getTexCoords().addAll(texCoords);
+        mesh.getFaces().addAll(faces);
+
+        // Create a NeshView
+        MeshView meshView = new MeshView();
+        meshView.setMesh(mesh);
+
+        // Scale the Meshview to make it look bigger
+        meshView.setScaleX(10.0);
+        meshView.setScaleY(10.0);
+        meshView.setScaleZ(10.0);
+
+        world.getChildren().addAll(meshView);
     }
 
     @Override
@@ -281,6 +324,8 @@ public class MoleculeSampleApp extends Application {
         buildCamera();
         buildAxes();
         buildMolecule();
+
+        buildMesh();
 
         Scene scene = new Scene(root, 1024, 768, true);
         scene.setFill(Color.GREY);
