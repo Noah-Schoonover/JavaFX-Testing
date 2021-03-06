@@ -46,6 +46,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  *
  * @author cmcastil
@@ -122,7 +125,7 @@ public class MoleculeSampleApp extends Application {
         zAxis.setMaterial(blueMaterial);
 
         axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
-        axisGroup.setVisible(false);
+        //axisGroup.setVisible(false);
         world.getChildren().addAll(axisGroup);
     }
 
@@ -268,30 +271,81 @@ public class MoleculeSampleApp extends Application {
 
         groundGroup.getChildren().add(moleculeXform);
 
+        groundGroup.setVisible(false);
         world.getChildren().addAll(groundGroup);
+    }
+
+    public int getRandomInt(int min, int max) {
+        return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 
     public void buildMesh() {
 
-        float[] points =
-                {
-                        50, 0, 0,
-                        45, 0, 10,
-                        55, 0, 10
-                };
+        int meshWidth = 10;
+        int meshHeight = 10;
+        int scale = 10;
 
-        float[] texCoords =
-                {
-                        0.5f, 0.5f,
-                        0.0f, 1.0f,
-                        1.0f, 1.0f
-                };
+        float[] points = new float[meshWidth*meshHeight*3];
 
-        int[] faces =
-                {
-                        0, 0, 2, 2, 1, 1,
-                        0, 0, 1, 1, 2, 2
-                };
+        for (int i = 0; i < meshWidth*meshHeight; i++) {
+
+            points[i*3] = (i % meshWidth) * scale;          // set x value
+            points[i*3+1] = 0; // getRandomInt(-1, 1) * scale;    // set y value
+            points[i*3+2] = i / meshHeight * scale;         // set z value
+
+        }
+
+//        for (int i = 0; i < meshWidth*meshHeight; i++) {
+//            System.out.println(points[i*3] + ", " + points[i*3+1] + ", " + points[i*3+2]);
+//        }
+
+        float[] texCoords = new float[meshWidth*meshHeight*2];
+        Arrays.fill(texCoords, 0);
+
+        int numFaces = (meshWidth-1)*(meshWidth-1)*2*2;
+        int[] faces = new int[numFaces*6];
+
+        System.out.println("numFaces: " + numFaces);
+
+        for (int i = 0, f = 0; i < meshWidth*meshHeight - meshWidth; i++) {
+
+            if(i % meshWidth == 0) continue;    // skip the first point of every row
+
+            faces[f*6] = faces[f*6+1] = i-1;
+            faces[f*6+2] = faces[f*6+3] = i;
+            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
+
+            f++; // next face
+
+            faces[f*6] = faces[f*6+1] = i-1;
+            faces[f*6+2] = faces[f*6+3] = i;
+            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
+
+            f++; // next face
+
+            faces[f*6] = faces[f*6+1] = i;
+            faces[f*6+2] = faces[f*6+3] = i-1 + meshWidth;
+            faces[f*6+4] = faces[f*6+5] = i + meshWidth;
+
+            f++; //next face
+
+            faces[f*6] = faces[f*6+1] = i;
+            faces[f*6+2] = faces[f*6+3] = i-1 + meshWidth;
+            faces[f*6+4] = faces[f*6+5] = i + meshWidth;
+
+            f++; //next face
+
+        }
+
+        for (int i = 0; i < numFaces; i++) {
+            System.out.println(faces[i*6] + ", " + faces[i*6+1] + ", " + faces[i*6+2] + ", "
+                    + faces[i*6+3] + ", " + faces[i*6+4] + ", " + faces[i*6+5]);
+        }
+
+//                {
+//                        0, 0, 2, 2, 1, 1,
+//                        1, 1, 2, 2, 3, 3
+//                };
 
         // Create a TriangleMesh
         TriangleMesh mesh = new TriangleMesh();
@@ -304,9 +358,9 @@ public class MoleculeSampleApp extends Application {
         meshView.setMesh(mesh);
 
         // Scale the Meshview to make it look bigger
-        meshView.setScaleX(10.0);
-        meshView.setScaleY(10.0);
-        meshView.setScaleZ(10.0);
+//        meshView.setScaleX(10.0);
+//        meshView.setScaleY(10.0);
+//        meshView.setScaleZ(10.0);
 
         world.getChildren().addAll(meshView);
     }
