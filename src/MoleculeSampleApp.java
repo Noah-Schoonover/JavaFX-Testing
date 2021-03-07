@@ -46,8 +46,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 
 /**
  *
@@ -195,84 +198,17 @@ public class MoleculeSampleApp extends Application {
         });
     }
 
-    private void buildMolecule() {
-        //======================================================================
-        // THIS IS THE IMPORTANT MATERIAL FOR THE TUTORIAL
-        //======================================================================
+    private Group loadModel(URL url) {
+        Group modelRoot = new Group();
 
-        final PhongMaterial redMaterial = new PhongMaterial();
-        redMaterial.setDiffuseColor(Color.DARKRED);
-        redMaterial.setSpecularColor(Color.RED);
+        ObjModelImporter importer = new ObjModelImporter();
+        importer.read(url);
 
-        final PhongMaterial whiteMaterial = new PhongMaterial();
-        whiteMaterial.setDiffuseColor(Color.WHITE);
-        whiteMaterial.setSpecularColor(Color.LIGHTBLUE);
+        for (MeshView view : importer.getImport()) {
+            modelRoot.getChildren().add(view);
+        }
 
-        final PhongMaterial greyMaterial = new PhongMaterial();
-        greyMaterial.setDiffuseColor(Color.DARKGREY);
-        greyMaterial.setSpecularColor(Color.GREY);
-
-        // Molecule Hierarchy
-        // [*] moleculeXform
-        //     [*] oxygenXform
-        //         [*] oxygenSphere
-        //     [*] hydrogen1SideXform
-        //         [*] hydrogen1Xform
-        //             [*] hydrogen1Sphere
-        //         [*] bond1Cylinder
-        //     [*] hydrogen2SideXform
-        //         [*] hydrogen2Xform
-        //             [*] hydrogen2Sphere
-        //         [*] bond2Cylinder
-        Xform moleculeXform = new Xform();
-        Xform oxygenXform = new Xform();
-        Xform hydrogen1SideXform = new Xform();
-        Xform hydrogen1Xform = new Xform();
-        Xform hydrogen2SideXform = new Xform();
-        Xform hydrogen2Xform = new Xform();
-
-        Sphere oxygenSphere = new Sphere(40.0);
-        oxygenSphere.setMaterial(redMaterial);
-
-        Sphere hydrogen1Sphere = new Sphere(30.0);
-        hydrogen1Sphere.setMaterial(whiteMaterial);
-        hydrogen1Sphere.setTranslateX(0.0);
-
-        Sphere hydrogen2Sphere = new Sphere(30.0);
-        hydrogen2Sphere.setMaterial(whiteMaterial);
-        hydrogen2Sphere.setTranslateZ(0.0);
-
-        Cylinder bond1Cylinder = new Cylinder(5, 100);
-        bond1Cylinder.setMaterial(greyMaterial);
-        bond1Cylinder.setTranslateX(50.0);
-        bond1Cylinder.setRotationAxis(Rotate.Z_AXIS);
-        bond1Cylinder.setRotate(90.0);
-
-        Cylinder bond2Cylinder = new Cylinder(5, 100);
-        bond2Cylinder.setMaterial(greyMaterial);
-        bond2Cylinder.setTranslateX(50.0);
-        bond2Cylinder.setRotationAxis(Rotate.Z_AXIS);
-        bond2Cylinder.setRotate(90.0);
-
-        moleculeXform.getChildren().add(oxygenXform);
-        moleculeXform.getChildren().add(hydrogen1SideXform);
-        moleculeXform.getChildren().add(hydrogen2SideXform);
-        oxygenXform.getChildren().add(oxygenSphere);
-        hydrogen1SideXform.getChildren().add(hydrogen1Xform);
-        hydrogen2SideXform.getChildren().add(hydrogen2Xform);
-        hydrogen1Xform.getChildren().add(hydrogen1Sphere);
-        hydrogen2Xform.getChildren().add(hydrogen2Sphere);
-        hydrogen1SideXform.getChildren().add(bond1Cylinder);
-        hydrogen2SideXform.getChildren().add(bond2Cylinder);
-
-        hydrogen1Xform.setTx(100.0);
-        hydrogen2Xform.setTx(100.0);
-        hydrogen2SideXform.setRotateY(HYDROGEN_ANGLE);
-
-        groundGroup.getChildren().add(moleculeXform);
-
-        groundGroup.setVisible(false);
-        world.getChildren().addAll(groundGroup);
+        return modelRoot;
     }
 
     public int getRandomInt(int min, int max) {
@@ -284,13 +220,14 @@ public class MoleculeSampleApp extends Application {
         int meshWidth = 10;
         int meshHeight = 10;
         int scale = 10;
+        int verticalScale = 3;
 
         float[] points = new float[meshWidth*meshHeight*3];
 
         for (int i = 0; i < meshWidth*meshHeight; i++) {
 
             points[i*3] = (i % meshWidth) * scale;          // set x value
-            points[i*3+1] = 0; // getRandomInt(-1, 1) * scale;    // set y value
+            points[i*3+1] = getRandomInt(-1, 1) * verticalScale;    // set y value
             points[i*3+2] = i / meshHeight * scale;         // set z value
 
         }
@@ -302,7 +239,7 @@ public class MoleculeSampleApp extends Application {
         float[] texCoords = new float[meshWidth*meshHeight*2];
         Arrays.fill(texCoords, 0);
 
-        int numFaces = (meshWidth-1)*(meshWidth-1)*2*2;
+        int numFaces = (meshWidth-1)*(meshWidth-1)*2;
         int[] faces = new int[numFaces*6];
 
         System.out.println("numFaces: " + numFaces);
@@ -311,23 +248,11 @@ public class MoleculeSampleApp extends Application {
 
             if(i % meshWidth == 0) continue;    // skip the first point of every row
 
-            faces[f*6] = faces[f*6+1] = i-1;
-            faces[f*6+2] = faces[f*6+3] = i;
-            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
-
-            f++; // next face
-
-            faces[f*6] = faces[f*6+1] = i-1;
-            faces[f*6+2] = faces[f*6+3] = i;
-            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
-
-            f++; // next face
-
             faces[f*6] = faces[f*6+1] = i;
-            faces[f*6+2] = faces[f*6+3] = i-1 + meshWidth;
-            faces[f*6+4] = faces[f*6+5] = i + meshWidth;
+            faces[f*6+2] = faces[f*6+3] = i-1;
+            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
 
-            f++; //next face
+            f++; // next face
 
             faces[f*6] = faces[f*6+1] = i;
             faces[f*6+2] = faces[f*6+3] = i-1 + meshWidth;
@@ -377,9 +302,16 @@ public class MoleculeSampleApp extends Application {
         // buildScene();
         buildCamera();
         buildAxes();
-        buildMolecule();
 
         buildMesh();
+
+        Group tree = loadModel(getClass().getResource("lowpolytree.obj"));
+        tree.setRotationAxis(Rotate.Z_AXIS);
+        tree.setRotate(180.0);
+        tree.setScaleX(10.0);
+        tree.setScaleY(10.0);
+        tree.setScaleZ(10.0);
+        world.getChildren().addAll(tree);
 
         Scene scene = new Scene(root, 1024, 768, true);
         scene.setFill(Color.GREY);
