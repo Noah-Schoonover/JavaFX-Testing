@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.DrawMode;
 import javafx.stage.Stage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -191,7 +192,6 @@ public class JavaFXSampleApp extends Application {
      * @return a JavaFX Group containing all of the imported meshes
      */
     private Group loadModel(URL url) {
-        System.out.println("loadModel()");
         Group modelRoot = new Group();
 
         ObjModelImporter importer = new ObjModelImporter();
@@ -199,7 +199,6 @@ public class JavaFXSampleApp extends Application {
 
         for (MeshView view : importer.getImport()) {
             modelRoot.getChildren().add(view);
-            System.out.println(view.getId());
         }
 
         return modelRoot;
@@ -237,8 +236,8 @@ public class JavaFXSampleApp extends Application {
         int verticalScale = 3;
 
         final PhongMaterial groundMaterial = new PhongMaterial();
-        groundMaterial.setDiffuseColor(Color.GREEN);
-        groundMaterial.setSpecularColor(Color.GREEN);
+        groundMaterial.setDiffuseColor(Color.SANDYBROWN);
+        groundMaterial.setSpecularColor(Color.BLACK);
         groundMaterial.setSpecularPower(10);
 
         // Generate point data array
@@ -296,6 +295,7 @@ public class JavaFXSampleApp extends Application {
         meshView.setMesh(mesh);
 
         meshView.setMaterial(groundMaterial);
+        //meshView.setDrawMode(DrawMode.LINE);
 
         world.getChildren().addAll(meshView);
     }
@@ -319,7 +319,7 @@ public class JavaFXSampleApp extends Application {
 
         final PhongMaterial leavesMaterial = new PhongMaterial();
         leavesMaterial.setDiffuseColor(Color.GREEN);
-        leavesMaterial.setSpecularColor(Color.GREEN);
+        leavesMaterial.setSpecularColor(Color.BLACK);
         leavesMaterial.setSpecularPower(1000);
 
         MeshView leaves = (MeshView) tree.getChildren().get(0);
@@ -338,11 +338,11 @@ public class JavaFXSampleApp extends Application {
      */
     public void makeTreeRed(Group tree) {
         MeshView leaves = (MeshView) tree.getChildren().get(0);
-        if(leaves.getId().equals("Cylinder_Leaves") == false) { return; }
+        if(!leaves.getId().equals("Cylinder_Leaves")) { return; }
 
         final PhongMaterial redMaterial = new PhongMaterial();
         redMaterial.setDiffuseColor(Color.DARKRED);
-        redMaterial.setSpecularColor(Color.RED);
+        redMaterial.setSpecularColor(Color.BLACK);
         redMaterial.setSpecularPower(1000);
 
         leaves.setMaterial(redMaterial);
@@ -381,7 +381,7 @@ public class JavaFXSampleApp extends Application {
         world.getChildren().addAll(tree);
 
         Scene scene = new Scene(root, 1024, 768, true);
-        scene.setFill(Color.LIGHTBLUE);
+        scene.setFill(Color.BLACK);
         handleKeyboard(scene);
         handleMouse(scene);
 
