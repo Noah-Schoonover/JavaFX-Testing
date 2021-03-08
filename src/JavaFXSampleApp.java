@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
+import org.w3c.dom.ranges.Range;
 
 //----------------------------------------------------------------------------------------------------------------------
 // ::JavaFXSampleApp
@@ -230,8 +231,8 @@ public class JavaFXSampleApp extends Application {
      */
     public void buildGround() {
 
-        int meshWidth = 10;
-        int meshHeight = 10;
+        int meshWidth = 30;
+        int meshHeight = 30;
         int scale = 10;
         int verticalScale = 3;
 
@@ -300,6 +301,55 @@ public class JavaFXSampleApp extends Application {
     }
 
     //--------------------------------------------------------------------------------------------------
+    // JavaFXSampleApp::buildNewTree
+    //
+
+    public Group buildNewTree() {
+
+        Group tree = loadModel(getClass().getResource("lowpolytree.obj"));
+
+        tree.setRotationAxis(Rotate.Z_AXIS);
+        tree.setRotate(180.0);
+        tree.setScaleX(10.0);
+        tree.setScaleY(10.0);
+        tree.setScaleZ(10.0);
+        tree.setTranslateY(30);
+        tree.setTranslateX(getRandomInt(5, 285));
+        tree.setTranslateZ(getRandomInt(5, 285));
+
+        final PhongMaterial leavesMaterial = new PhongMaterial();
+        leavesMaterial.setDiffuseColor(Color.GREEN);
+        leavesMaterial.setSpecularColor(Color.GREEN);
+        leavesMaterial.setSpecularPower(1000);
+
+        MeshView leaves = (MeshView) tree.getChildren().get(0);
+        leaves.setMaterial(leavesMaterial);
+
+        return tree;
+    }
+
+    //--------------------------------------------------------------------------------------------------
+    // JavaFXSampleApp::makeTreeRed
+    //
+    /**
+     * sets the leaves mesh of a tree group to red material to indicate that the tree is marked for cutting
+     *
+     * @param tree the tree to make red
+     */
+    public void makeTreeRed(Group tree) {
+        MeshView leaves = (MeshView) tree.getChildren().get(0);
+        if(leaves.getId().equals("Cylinder_Leaves") == false) { return; }
+
+        final PhongMaterial redMaterial = new PhongMaterial();
+        redMaterial.setDiffuseColor(Color.DARKRED);
+        redMaterial.setSpecularColor(Color.RED);
+        redMaterial.setSpecularPower(1000);
+
+        leaves.setMaterial(redMaterial);
+    }
+
+
+    //--------------------------------------------------------------------------------------------------
     // JavaFXSampleApp::start
     //
     /**
@@ -318,46 +368,20 @@ public class JavaFXSampleApp extends Application {
         buildAxes();
         buildGround();
 
+        for(int i = 0; i < 20; i++) {
+            Group tree = buildNewTree();
+            world.getChildren().addAll(tree);
+        }
 
-
-        Group tree = loadModel(getClass().getResource("lowpolytree.obj"));
+        Group tree = buildNewTree();
         tree.setTranslateY(30);
-        tree.setTranslateX(60);
-        tree.setTranslateZ(60);
-        MeshView leaves = (MeshView) tree.getChildren().get(0);
-        final PhongMaterial leavesMaterial = new PhongMaterial();
-        leavesMaterial.setDiffuseColor(Color.GREEN);
-        leavesMaterial.setSpecularColor(Color.GREEN);
-        leavesMaterial.setSpecularPower(1000);
-        leaves.setMaterial(leavesMaterial);
-        tree.setRotationAxis(Rotate.Z_AXIS);
-        tree.setRotate(180.0);
-        tree.setScaleX(10.0);
-        tree.setScaleY(10.0);
-        tree.setScaleZ(10.0);
+        tree.setTranslateX(30);
+        tree.setTranslateZ(30);
+        makeTreeRed(tree);
         world.getChildren().addAll(tree);
 
-        Group tree2 = loadModel(getClass().getResource("lowpolytree.obj"));
-        tree2.setTranslateY(30);
-        tree2.setTranslateX(30);
-        tree2.setTranslateZ(30);
-        leaves = (MeshView) tree2.getChildren().get(0);
-        final PhongMaterial redMaterial = new PhongMaterial();
-        redMaterial.setDiffuseColor(Color.DARKRED);
-        redMaterial.setSpecularColor(Color.RED);
-        redMaterial.setSpecularPower(1000);
-        leaves.setMaterial(redMaterial);
-        tree2.setRotationAxis(Rotate.Z_AXIS);
-        tree2.setRotate(180.0);
-        tree2.setScaleX(10.0);
-        tree2.setScaleY(10.0);
-        tree2.setScaleZ(10.0);
-        world.getChildren().addAll(tree2);
-
-
-
         Scene scene = new Scene(root, 1024, 768, true);
-        scene.setFill(Color.GREY);
+        scene.setFill(Color.LIGHTBLUE);
         handleKeyboard(scene);
         handleMouse(scene);
 
