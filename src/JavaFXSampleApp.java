@@ -45,7 +45,7 @@ public class JavaFXSampleApp extends Application {
     private static final double SHIFT_MULTIPLIER = 10.0;
     private static final double MOUSE_SPEED = 0.5;
     private static final double ROTATION_SPEED = 0.3;
-    private static final double TRACK_SPEED = 0.3;
+    private static final double TRACK_SPEED = 0.6;
 
     double mousePosX;
     double mousePosY;
@@ -141,15 +141,29 @@ public class JavaFXSampleApp extends Application {
                 modifier = SHIFT_MULTIPLIER;
             }
             if (me.isPrimaryButtonDown()) {
+
                 cameraXform.ry.setAngle(cameraXform.ry.getAngle() - mouseDeltaX * MOUSE_SPEED * modifier * ROTATION_SPEED);
                 cameraXform.rx.setAngle(cameraXform.rx.getAngle() + mouseDeltaY * MOUSE_SPEED * modifier * ROTATION_SPEED);
+
             } else if (me.isSecondaryButtonDown()) {
+
                 double z = camera.getTranslateZ();
                 double newZ = z + mouseDeltaX * MOUSE_SPEED * modifier;
                 camera.setTranslateZ(newZ);
+
             } else if (me.isMiddleButtonDown()) {
-                cameraXform2.t.setX(cameraXform2.t.getX() + mouseDeltaX * MOUSE_SPEED * modifier * TRACK_SPEED);
-                cameraXform2.t.setY(cameraXform2.t.getY() + mouseDeltaY * MOUSE_SPEED * modifier * TRACK_SPEED);
+
+                double angle = Math.toRadians(cameraXform.ry.getAngle());
+                double cos = Math.cos(angle);
+                double sin = Math.sin(angle);
+
+                double x = cameraXform.t.getX();
+                x = x + (mouseDeltaX * cos + mouseDeltaY * sin) * MOUSE_SPEED * modifier * TRACK_SPEED;
+                cameraXform.t.setX(x);
+
+                double z = cameraXform.t.getZ();
+                z = z + (mouseDeltaX * sin * -1 + mouseDeltaY * cos) * MOUSE_SPEED * modifier * TRACK_SPEED;
+                cameraXform.t.setZ(z);
             }
         });
     }
@@ -236,9 +250,9 @@ public class JavaFXSampleApp extends Application {
         int verticalScale = 3;
 
         final PhongMaterial groundMaterial = new PhongMaterial();
-        groundMaterial.setDiffuseColor(Color.SANDYBROWN);
+        groundMaterial.setDiffuseColor(Color.web("0x694800"));
         groundMaterial.setSpecularColor(Color.BLACK);
-        groundMaterial.setSpecularPower(10);
+//        groundMaterial.setSpecularPower(10);
 
         // Generate point data array
         float[] points = new float[meshWidth*meshHeight*3];
@@ -297,7 +311,8 @@ public class JavaFXSampleApp extends Application {
         meshView.setMaterial(groundMaterial);
         //meshView.setDrawMode(DrawMode.LINE);
 
-        world.getChildren().addAll(meshView);
+        groundGroup.getChildren().addAll(meshView);
+        world.getChildren().addAll(groundGroup);
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -385,7 +400,7 @@ public class JavaFXSampleApp extends Application {
         handleKeyboard(scene);
         handleMouse(scene);
 
-        primaryStage.setTitle("Molecule Sample Application");
+        primaryStage.setTitle("JavaFX Sample Application");
         primaryStage.setScene(scene);
         primaryStage.show();
 
