@@ -28,4 +28,9 @@ public class Point {
 
     }
 
+    @Override
+    public String toString() {
+        return String.format(this.x + " " + this.y + " " + this.z);
+    }
+
 }

@@ -1,22 +1,10 @@
-import com.sun.prism.Material;
-import com.sun.prism.MeshView;
-import com.sun.source.tree.Tree;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
-// import javafx.scene.shape.DrawMode;
 import javafx.stage.Stage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.transform.Rotate;
-
-import javafx.scene.shape.TriangleMesh;
-
-import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
-
-import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 
 //----------------------------------------------------------------------------------------------------------------------
 // ::JavaFXSampleApp
@@ -67,10 +55,6 @@ public class JavaFXSampleApp extends Application {
         cameraXform.getChildren().add(cameraXform2);
         cameraXform2.getChildren().add(cameraXform3);
         cameraXform3.getChildren().add(camera);
-
-//        PointLight light = new PointLight();
-//        light.setColor(Color.WHITE);
-//        cameraXform3.getChildren().add(light);
 
         cameraXform3.setRotateZ(180.0);
 

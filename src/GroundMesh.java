@@ -3,7 +3,6 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class GroundMesh extends MeshView {
 
-    // private Point[][] points;
+    private Point[][] points;
 
     private int length;
     private int width;
@@ -36,7 +35,8 @@ public class GroundMesh extends MeshView {
         this.length = length;
         this.width = width;
 
-        // points = new Point[width][length];
+        points = new Point[width][length];
+        generatePointArray();
 
         buildGroundMesh();
 
@@ -48,7 +48,7 @@ public class GroundMesh extends MeshView {
     private void buildGroundMesh() {
 
         TriangleMesh mesh = new TriangleMesh();
-        mesh.getPoints().addAll(generatePointArray());
+        mesh.getPoints().addAll(convertPointsToRawData());
         mesh.getTexCoords().addAll(generateTextureArray());
         mesh.getFaces().addAll(generateFaceArray());
 
@@ -69,23 +69,49 @@ public class GroundMesh extends MeshView {
      * Generates the point data in an array. The x/z points lie on a width * length grid.
      * The y points are currently randomized
      */
-    private float[] generatePointArray() {
+    private void generatePointArray() {
 
-        float[] points = new float[width*length*3];
+        for(int x = 0; x < width; x++) {
+
+            for(int z = 0; z < length; z++) {
+
+                points[x][z] = new Point(
+                        x * HORIZONTAL_SCALE,
+                        ThreadLocalRandom.current().nextInt(0, 3) * VERTICAL_SCALE,
+                        z * HORIZONTAL_SCALE);
+
+            }
+
+        }
+
+    }
+
+    //--------------------------------------------------------------------------------------------------
+    // GroundMesh::convertPointsToRawData
+    //
+    /**
+     * Converts the 2D array of Point objects to a 1D array of points to be accepted by the TriangleMesh class
+     */
+    private float[] convertPointsToRawData() {
+
+        float[] pointsRaw = new float[width*length*3];
 
         for (int i = 0; i < width*length; i++) {
-            points[i*3] = (i % width) * HORIZONTAL_SCALE;          // set x value
-            points[i*3+1] = ThreadLocalRandom.current().nextInt(0, 3) * VERTICAL_SCALE;    // set y value
-            points[i*3+2] = (float) (i / length * HORIZONTAL_SCALE);         // set z value
+
+            Point point = points[i % width][i / length];
+
+            pointsRaw[i*3] = point.x;
+            pointsRaw[i*3+1] = point.y;
+            pointsRaw[i*3+2] = point.z;
+
         }
 
-        /*
-        for (int i = 0; i < meshWidth*meshHeight; i++) {
-            System.out.println(points[i*3] + ", " + points[i*3+1] + ", " + points[i*3+2]);
+/*      Print raw point data for debugging
+        for (int i = 0; i < width*length; i++) {
+            System.out.println(pointsRaw[i*3] + ", " + pointsRaw[i*3+1] + ", " + pointsRaw[i*3+2]);
         }
-        */
-
-        return points;
+*/
+        return pointsRaw;
 
     }
 
