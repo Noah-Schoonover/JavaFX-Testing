@@ -1,13 +1,15 @@
+import com.sun.prism.Material;
+import com.sun.prism.MeshView;
+import com.sun.source.tree.Tree;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.DrawMode;
+// import javafx.scene.shape.DrawMode;
 import javafx.stage.Stage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.transform.Rotate;
 
-import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
 import java.net.URL;
@@ -15,7 +17,6 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
-import org.w3c.dom.ranges.Range;
 
 //----------------------------------------------------------------------------------------------------------------------
 // ::JavaFXSampleApp
@@ -66,6 +67,11 @@ public class JavaFXSampleApp extends Application {
         cameraXform.getChildren().add(cameraXform2);
         cameraXform2.getChildren().add(cameraXform3);
         cameraXform3.getChildren().add(camera);
+
+//        PointLight light = new PointLight();
+//        light.setColor(Color.WHITE);
+//        cameraXform3.getChildren().add(light);
+
         cameraXform3.setRotateZ(180.0);
 
         camera.setNearClip(CAMERA_NEAR_CLIP);
@@ -73,6 +79,7 @@ public class JavaFXSampleApp extends Application {
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
         cameraXform.ry.setAngle(CAMERA_INITIAL_Y_ANGLE);
         cameraXform.rx.setAngle(CAMERA_INITIAL_X_ANGLE);
+
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -169,7 +176,7 @@ public class JavaFXSampleApp extends Application {
     }
 
     //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::buildAxes
+    // JavaFXSampleApp::handleKeyboard
     //
     /**
      * Modify the scene on keyboard events.
@@ -197,25 +204,26 @@ public class JavaFXSampleApp extends Application {
     }
 
     //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::loadModel
+    // JavaFXSampleApp::buildLights
     //
     /**
-     * Loads a model from OBJ file type using the InteractiveMesh.org ObjModelImporter and return it as a group.
-     *
-     * @param url the url path to the 3d file
-     * @return a JavaFX Group containing all of the imported meshes
+     * Adds lights to the scene
      */
-    private Group loadModel(URL url) {
-        Group modelRoot = new Group();
+    private void buildLights() {
 
-        ObjModelImporter importer = new ObjModelImporter();
-        importer.read(url);
+        AmbientLight ambientLight = new AmbientLight();
+        ambientLight.setColor(Color.rgb(90, 90, 90, 1));
 
-        for (MeshView view : importer.getImport()) {
-            modelRoot.getChildren().add(view);
-        }
+        PointLight light = new PointLight();
+        light.setColor(Color.WHITE);
+//        light.setLayoutX(400);
+//        light.setLayoutY(100);
+        light.setTranslateX(100);
+        light.setTranslateY(300);
+        light.setTranslateZ(100);
+        //light.getScope().add(sh);
+        world.getChildren().addAll(light, ambientLight);
 
-        return modelRoot;
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -235,136 +243,6 @@ public class JavaFXSampleApp extends Application {
     }
 
     //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::buildGround
-    //
-    /**
-     * Generates the ground mesh.
-     *
-     * currently randomized topology
-     */
-    public void buildGround() {
-
-        int meshWidth = 30;
-        int meshHeight = 30;
-        int scale = 10;
-        int verticalScale = 3;
-
-        final PhongMaterial groundMaterial = new PhongMaterial();
-        groundMaterial.setDiffuseColor(Color.web("0x694800"));
-        groundMaterial.setSpecularColor(Color.BLACK);
-//        groundMaterial.setSpecularPower(10);
-
-        // Generate point data array
-        float[] points = new float[meshWidth*meshHeight*3];
-
-        for (int i = 0; i < meshWidth*meshHeight; i++) {
-            points[i*3] = (i % meshWidth) * scale;          // set x value
-            points[i*3+1] = getRandomInt(0, 2) * verticalScale;    // set y value
-            points[i*3+2] = (float) (i / meshHeight * scale);         // set z value
-        }
-
-//        for (int i = 0; i < meshWidth*meshHeight; i++) {
-//            System.out.println(points[i*3] + ", " + points[i*3+1] + ", " + points[i*3+2]);
-//        }
-
-        // Generate texture data array
-        float[] texCoords = new float[meshWidth*meshHeight*2];
-        Arrays.fill(texCoords, 0);
-
-        // Generate face data array
-        int numFaces = (meshWidth-1)*(meshWidth-1)*2;
-        int[] faces = new int[numFaces*6];
-
-        for (int i = 0, f = 0; i < meshWidth*meshHeight - meshWidth; i++) {
-
-            if(i % meshWidth == 0) continue;    // skip the first point of every row
-
-            faces[f*6] = faces[f*6+1] = i;
-            faces[f*6+2] = faces[f*6+3] = i-1;
-            faces[f*6+4] = faces[f*6+5] = i-1 + meshWidth;
-
-            f++; // next face
-
-            faces[f*6] = faces[f*6+1] = i;
-            faces[f*6+2] = faces[f*6+3] = i-1 + meshWidth;
-            faces[f*6+4] = faces[f*6+5] = i + meshWidth;
-
-            f++; //next face
-
-        }
-
-//        for (int i = 0; i < numFaces; i++) {
-//            System.out.println(faces[i*6] + ", " + faces[i*6+1] + ", " + faces[i*6+2] + ", "
-//                    + faces[i*6+3] + ", " + faces[i*6+4] + ", " + faces[i*6+5]);
-//        }
-
-        // Create a TriangleMesh
-        TriangleMesh mesh = new TriangleMesh();
-        mesh.getPoints().addAll(points);
-        mesh.getTexCoords().addAll(texCoords);
-        mesh.getFaces().addAll(faces);
-
-        // Create a MeshView
-        MeshView meshView = new MeshView();
-        meshView.setMesh(mesh);
-
-        meshView.setMaterial(groundMaterial);
-        //meshView.setDrawMode(DrawMode.LINE);
-
-        groundGroup.getChildren().addAll(meshView);
-        world.getChildren().addAll(groundGroup);
-    }
-
-    //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::buildNewTree
-    //
-
-    public Group buildNewTree() {
-
-        Group tree = loadModel(getClass().getResource("lowpolytree.obj"));
-
-        tree.setRotationAxis(Rotate.Z_AXIS);
-        tree.setRotate(180.0);
-        tree.setScaleX(10.0);
-        tree.setScaleY(10.0);
-        tree.setScaleZ(10.0);
-        tree.setTranslateY(30);
-        tree.setTranslateX(getRandomInt(5, 285));
-        tree.setTranslateZ(getRandomInt(5, 285));
-
-        final PhongMaterial leavesMaterial = new PhongMaterial();
-        leavesMaterial.setDiffuseColor(Color.GREEN);
-        leavesMaterial.setSpecularColor(Color.BLACK);
-        leavesMaterial.setSpecularPower(1000);
-
-        MeshView leaves = (MeshView) tree.getChildren().get(0);
-        leaves.setMaterial(leavesMaterial);
-
-        return tree;
-    }
-
-    //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::makeTreeRed
-    //
-    /**
-     * sets the leaves mesh of a tree group to red material to indicate that the tree is marked for cutting
-     *
-     * @param tree the tree to make red
-     */
-    public void makeTreeRed(Group tree) {
-        MeshView leaves = (MeshView) tree.getChildren().get(0);
-        if(!leaves.getId().equals("Cylinder_Leaves")) { return; }
-
-        final PhongMaterial redMaterial = new PhongMaterial();
-        redMaterial.setDiffuseColor(Color.DARKRED);
-        redMaterial.setSpecularColor(Color.BLACK);
-        redMaterial.setSpecularPower(1000);
-
-        leaves.setMaterial(redMaterial);
-    }
-
-
-    //--------------------------------------------------------------------------------------------------
     // JavaFXSampleApp::start
     //
     /**
@@ -380,23 +258,14 @@ public class JavaFXSampleApp extends Application {
         root.setDepthTest(DepthTest.ENABLE);
 
         buildCamera();
+        buildLights();
         buildAxes();
-        buildGround();
 
-        for(int i = 0; i < 20; i++) {
-            Group tree = buildNewTree();
-            world.getChildren().addAll(tree);
-        }
-
-        Group tree = buildNewTree();
-        tree.setTranslateY(30);
-        tree.setTranslateX(30);
-        tree.setTranslateZ(30);
-        makeTreeRed(tree);
-        world.getChildren().addAll(tree);
+        ForestGroup forest = new ForestGroup();
+        world.getChildren().add(forest);
 
         Scene scene = new Scene(root, 1024, 768, true);
-        scene.setFill(Color.BLACK);
+        scene.setFill(Color.LIGHTBLUE);
         handleKeyboard(scene);
         handleMouse(scene);
 
