@@ -1,3 +1,5 @@
+package com.treemoval.visualizer;
+
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -18,7 +20,7 @@ public class RockGroup extends Group {
     public RockGroup () {
 
         Group rockModels = ModelLoader.loadModel(
-                RockGroup.class.getClassLoader().getResource("RockPackByPava.obj"));
+                RockGroup.class.getClassLoader().getResource("com/treemoval/visualizer/RockPackByPava.obj"));
 
         int r1 = ThreadLocalRandom.current().nextInt(0, NUMBER_OF_ROCK_MODELS); // exclusive of upper bound
         int r2 = (r1 + 1) % NUMBER_OF_ROCK_MODELS;

@@ -1,4 +1,4 @@
-/*
+package com.treemoval.visualizer;/*
  * Copyright (c) 2013, 2014 Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *

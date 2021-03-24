@@ -1,3 +1,5 @@
+package com.treemoval.visualizer;
+
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import javafx.scene.Group;
 import javafx.scene.shape.MeshView;

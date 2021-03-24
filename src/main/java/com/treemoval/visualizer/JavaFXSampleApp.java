@@ -1,10 +1,11 @@
+package com.treemoval.visualizer;
+
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import java.util.concurrent.ThreadLocalRandom;
 
 //----------------------------------------------------------------------------------------------------------------------
 // ::JavaFXSampleApp

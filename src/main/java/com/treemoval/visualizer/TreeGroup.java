@@ -1,3 +1,4 @@
+package com.treemoval.visualizer;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
