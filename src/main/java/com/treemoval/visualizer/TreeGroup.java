@@ -1,5 +1,6 @@
 package com.treemoval.visualizer;
 
+import javafx.scene.DepthTest;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -48,6 +49,9 @@ public class TreeGroup extends Group {
 
         MeshView leaves = (MeshView) getChildren().get(0);
         leaves.setMaterial(leavesMaterial);
+
+        setDepthTest(DepthTest.ENABLE);
+
 
     }
 
