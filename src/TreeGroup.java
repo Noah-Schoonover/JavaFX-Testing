@@ -36,11 +36,12 @@ public class TreeGroup extends Group {
         setScaleY(10.0);
         setScaleZ(10.0);
         setTranslateY(30);
-        setTranslateX(ThreadLocalRandom.current().nextInt(5, 285 + 1));
-        setTranslateZ(ThreadLocalRandom.current().nextInt(5, 285 + 1));
+        setTranslateX(ThreadLocalRandom.current().nextInt(5, 2990));
+        setTranslateZ(ThreadLocalRandom.current().nextInt(5, 2990));
 
         final PhongMaterial leavesMaterial = new PhongMaterial();
-        leavesMaterial.setDiffuseColor(Color.GREEN);
+        //leavesMaterial.setDiffuseColor(Color.GREEN);
+        leavesMaterial.setDiffuseColor(Color.web("0x056307"));
         leavesMaterial.setSpecularColor(Color.BLACK);
         leavesMaterial.setSpecularPower(1000);
 

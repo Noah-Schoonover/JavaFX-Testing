@@ -55,8 +55,12 @@ public class JavaFXSampleApp extends Application {
         cameraXform.getChildren().add(cameraXform2);
         cameraXform2.getChildren().add(cameraXform3);
         cameraXform3.getChildren().add(camera);
-
         cameraXform3.setRotateZ(180.0);
+
+        PointLight light = new PointLight();
+        light.setColor(Color.WHITE);
+        cameraXform3.getChildren().add(light);
+        light.setTranslateZ(CAMERA_INITIAL_DISTANCE);
 
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
@@ -125,6 +129,11 @@ public class JavaFXSampleApp extends Application {
 
             double modifier = 1.0;
 
+            // smart modifier to automatically increase control speed when zoomed out
+            double cameraZ = cameraXform3.getTranslateZ();
+            double smartModifier = 1.0;
+            if (cameraZ < -300) { smartModifier = (cameraZ * -1) / 300; }
+
             if (me.isControlDown()) {
                 modifier = CONTROL_MULTIPLIER;
             }
@@ -133,14 +142,23 @@ public class JavaFXSampleApp extends Application {
             }
             if (me.isPrimaryButtonDown()) {
 
-                cameraXform.ry.setAngle(cameraXform.ry.getAngle() - mouseDeltaX * MOUSE_SPEED * modifier * ROTATION_SPEED);
-                cameraXform.rx.setAngle(cameraXform.rx.getAngle() + mouseDeltaY * MOUSE_SPEED * modifier * ROTATION_SPEED);
+                double ry = cameraXform.ry.getAngle() - mouseDeltaX * MOUSE_SPEED * ROTATION_SPEED;
+                double rx = cameraXform.rx.getAngle() + mouseDeltaY * MOUSE_SPEED * ROTATION_SPEED;
+
+                // limit rotation from going below the horizon
+                if(rx < 3) { rx = 3; }
+
+                cameraXform.ry.setAngle(ry);
+                cameraXform.rx.setAngle(rx);
 
             } else if (me.isSecondaryButtonDown()) {
 
-                double z = camera.getTranslateZ();
-                double newZ = z + mouseDeltaX * MOUSE_SPEED * modifier;
-                camera.setTranslateZ(newZ);
+                double newZ = cameraZ + mouseDeltaX * MOUSE_SPEED * modifier * smartModifier;
+                // limit zoom in to prevent zooming through the horizon
+                if (newZ > 350) { newZ = 350; }
+                // limit zoom out to prevent far clip
+                if (newZ < -5000) { newZ = -5000; }
+                cameraXform3.setTranslateZ(newZ);
 
             } else if (me.isMiddleButtonDown()) {
 
@@ -149,11 +167,11 @@ public class JavaFXSampleApp extends Application {
                 double sin = Math.sin(angle);
 
                 double x = cameraXform.t.getX();
-                x = x + (mouseDeltaX * cos + mouseDeltaY * sin) * MOUSE_SPEED * modifier * TRACK_SPEED;
+                x = x + (mouseDeltaX * cos + mouseDeltaY * sin) * MOUSE_SPEED * modifier * smartModifier * TRACK_SPEED;
                 cameraXform.t.setX(x);
 
                 double z = cameraXform.t.getZ();
-                z = z + (mouseDeltaX * sin * -1 + mouseDeltaY * cos) * MOUSE_SPEED * modifier * TRACK_SPEED;
+                z = z + (mouseDeltaX * sin * -1 + mouseDeltaY * cos) * MOUSE_SPEED * modifier * smartModifier * TRACK_SPEED;
                 cameraXform.t.setZ(z);
             }
         });
@@ -188,45 +206,6 @@ public class JavaFXSampleApp extends Application {
     }
 
     //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::buildLights
-    //
-    /**
-     * Adds lights to the scene
-     */
-    private void buildLights() {
-
-        AmbientLight ambientLight = new AmbientLight();
-        ambientLight.setColor(Color.rgb(90, 90, 90, 1));
-
-        PointLight light = new PointLight();
-        light.setColor(Color.WHITE);
-//        light.setLayoutX(400);
-//        light.setLayoutY(100);
-        light.setTranslateX(100);
-        light.setTranslateY(300);
-        light.setTranslateZ(100);
-        //light.getScope().add(sh);
-        world.getChildren().addAll(light, ambientLight);
-
-    }
-
-    //--------------------------------------------------------------------------------------------------
-    // JavaFXSampleApp::getRandomInt
-    //
-    /**
-     * Yields a random integer between min and max (inclusive)
-     *
-     * currently used to randomize topology
-     *
-     * @param min the minimum bound for the random integer
-     * @param max the maximum bound for the random integer
-     * @return the random integer
-     */
-    public int getRandomInt(int min, int max) {
-        return ThreadLocalRandom.current().nextInt(min, max + 1);
-    }
-
-    //--------------------------------------------------------------------------------------------------
     // JavaFXSampleApp::start
     //
     /**
@@ -242,7 +221,6 @@ public class JavaFXSampleApp extends Application {
         root.setDepthTest(DepthTest.ENABLE);
 
         buildCamera();
-        buildLights();
         buildAxes();
 
         ForestGroup forest = new ForestGroup();

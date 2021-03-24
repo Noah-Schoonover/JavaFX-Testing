@@ -35,7 +35,6 @@ public class GroundMesh extends MeshView {
         this.length = length;
         this.width = width;
 
-        points = new Point[width][length];
         generatePointArray();
 
         buildGroundMesh();
@@ -47,6 +46,7 @@ public class GroundMesh extends MeshView {
     //
     private void buildGroundMesh() {
 
+        // build the mesh
         TriangleMesh mesh = new TriangleMesh();
         mesh.getPoints().addAll(convertPointsToRawData());
         mesh.getTexCoords().addAll(generateTextureArray());
@@ -54,6 +54,7 @@ public class GroundMesh extends MeshView {
 
         setMesh(mesh);
 
+        // set the material
         final PhongMaterial groundMaterial = new PhongMaterial();
         groundMaterial.setDiffuseColor(Color.web("0x4a2a00"));
         groundMaterial.setSpecularColor(Color.BLACK);
@@ -70,6 +71,8 @@ public class GroundMesh extends MeshView {
      * The y points are currently randomized
      */
     private void generatePointArray() {
+
+        points = new Point[width][length];
 
         for(int x = 0; x < width; x++) {
 

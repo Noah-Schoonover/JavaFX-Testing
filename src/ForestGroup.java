@@ -3,6 +3,7 @@
 // ::ForestBuilder
 //
 
+import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -15,12 +16,27 @@ public class ForestGroup extends Group {
 
     public ForestGroup() {
 
-        GroundMesh groundMesh = new GroundMesh(30, 30);
+        // build the ground
+        GroundMesh groundMesh = new GroundMesh(300, 300);
         getChildren().add(groundMesh);
 
+        AmbientLight ambientGroundLight = new AmbientLight();
+        ambientGroundLight.setColor(Color.rgb(200, 200, 200, 1));
+        ambientGroundLight.getScope().add(groundMesh);
+        getChildren().add(ambientGroundLight);
 
-        for(int i = 0; i < 20; i++) {
-            getChildren().addAll(new TreeGroup());
+
+        // build the trees
+        Group allTrees = new Group();
+        getChildren().add(allTrees);
+
+        AmbientLight ambientTreeLight = new AmbientLight();
+        ambientTreeLight.setColor(Color.rgb(90, 90, 90, 1));
+        ambientTreeLight.getScope().add(allTrees);
+        getChildren().add(ambientTreeLight);
+
+        for(int i = 0; i < 2000; i++) {
+            allTrees.getChildren().addAll(new TreeGroup());
         }
 
         TreeGroup tree = new TreeGroup();
@@ -28,7 +44,7 @@ public class ForestGroup extends Group {
         tree.setTranslateX(30);
         tree.setTranslateZ(30);
         tree.makeRed();
-        getChildren().addAll(tree);
+        allTrees.getChildren().addAll(tree);
 
         RockGroup rocks = new RockGroup();
         getChildren().add(rocks);
